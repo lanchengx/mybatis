@@ -397,7 +397,7 @@ public class PooledDataSource implements DataSource {
           }
           // 为返还的连接创建新的 PooledConnection 对象
           PooledConnection newConn = new PooledConnection(conn.getRealConnection(), this);
-          // 把该连接添加的空闲链表中
+          // 把该连接添加的空闲list中
           state.idleConnections.add(newConn);
           newConn.setCreatedTimestamp(conn.getCreatedTimestamp());
           newConn.setLastUsedTimestamp(conn.getLastUsedTimestamp());
@@ -443,7 +443,7 @@ public class PooledDataSource implements DataSource {
     int localBadConnectionCount = 0;
 
     while (conn == null) {
-      // synchronized 锁
+      // synchronized 锁同步，ArrayList线程不安全
       synchronized (state) {
         // 检测是否还有空闲的连接
         if (!state.idleConnections.isEmpty()) {
@@ -465,7 +465,7 @@ public class PooledDataSource implements DataSource {
             if (log.isDebugEnabled()) {
               log.debug("Created connection " + conn.getRealHashCode() + ".");
             }
-          // 活跃的连接数没有达到最大值，
+          // 活跃的连接数达到最大值，
           } else {
             // Cannot create new connection
             // 创建一个新的数据库连接
