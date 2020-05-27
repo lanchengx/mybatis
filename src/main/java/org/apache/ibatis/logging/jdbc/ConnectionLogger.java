@@ -47,19 +47,21 @@ public final class ConnectionLogger extends BaseJdbcLogger implements Invocation
   }
 
   @Override
-  public Object invoke(Object proxy, Method method, Object[] params)
-      throws Throwable {
+  public Object invoke(Object proxy, Method method, Object[] params) throws Throwable {
     try {
+      // method.getDeclaringClass用来判断当前这个方法是哪个类的方法。
+      // 如果动态代理对象调用的是toString，hashCode,getClass等这些从Object类继承过来的方法，就直接反射调用。
+      // 如果调用的是接口规定的方法。我们就用MapperMethod来执行。
       if (Object.class.equals(method.getDeclaringClass())) {
         return method.invoke(this, params);
       }
-      // 方法为prepareStatement 且开启debug模式打印sql
+      // 方法为prepareStatement 打印要执行的sql语句 并返回prepareStatement的代理对象
       if ("prepareStatement".equals(method.getName()) || "prepareCall".equals(method.getName())) {
         if (isDebugEnabled()) {
           // 打印sql
           debug(" Preparing: " + removeExtraWhitespace((String) params[0]), true);
         }
-
+        // 获取 PreparedStatement 对象
         PreparedStatement stmt = (PreparedStatement) method.invoke(connection, params);
         // 生成 PreparedStatement 的对象代理对象，使 PreparedStatement 具有日志打印功能
         stmt = PreparedStatementLogger.newInstance(stmt, statementLog, queryStack);

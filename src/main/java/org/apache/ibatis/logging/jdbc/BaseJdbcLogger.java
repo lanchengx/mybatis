@@ -41,6 +41,8 @@ import org.apache.ibatis.reflection.ArrayUtil;
 
 /**
  * 所有日志增强的基类
+ * 定义一些集合保存需要输出的方法名和要输出的字段
+ *
  */
 public abstract class BaseJdbcLogger {
 
@@ -71,8 +73,10 @@ public abstract class BaseJdbcLogger {
   protected final Log statementLog;
   protected final int queryStack;
 
-  /*
+  /**
    * Default constructor
+   * 默认构造方法
+   * todo queryStack  ?
    */
   public BaseJdbcLogger(Log log, int queryStack) {
     this.statementLog = log;
@@ -84,18 +88,21 @@ public abstract class BaseJdbcLogger {
   }
 
   static {
+    // 所有以set开始的方法
     SET_METHODS = Arrays.stream(PreparedStatement.class.getDeclaredMethods())
             .filter(method -> method.getName().startsWith("set"))
             .filter(method -> method.getParameterCount() > 1)
             .map(Method::getName)
             .collect(Collectors.toSet());
 
+    // jdbc执行sql的方法名
     EXECUTE_METHODS.add("execute");
     EXECUTE_METHODS.add("executeUpdate");
     EXECUTE_METHODS.add("executeQuery");
     EXECUTE_METHODS.add("addBatch");
   }
 
+  // 保存占位符以及占位符的值
   protected void setColumn(Object key, Object value) {
     columnMap.put(key, value);
     columnNames.add(key);
@@ -106,6 +113,10 @@ public abstract class BaseJdbcLogger {
     return columnMap.get(key);
   }
 
+  /**
+   * 获取占位符的值 用于输出
+   * @return
+   */
   protected String getParameterValueString() {
     List<Object> typeList = new ArrayList<>(columnValues.size());
     for (Object value : columnValues) {

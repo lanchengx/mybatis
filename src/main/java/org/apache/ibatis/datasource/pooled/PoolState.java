@@ -20,20 +20,33 @@ import java.util.List;
 
 /**
  * @author Clinton Begin
+ * PoolState 类主要是用来管理连接池的状态，比如哪些连接是空闲的，哪些是活动的，还可以创建多少连接等。
+ * 该类中只是定义了一些属性来进行控制连接池的状态，并没有任何的方法。
  */
 public class PoolState {
-
+  // 该 PoolState 属于哪个 PooledDataSource
   protected PooledDataSource dataSource;
 
+  // 来用存放空闲的 pooledConnection 连接
   protected final List<PooledConnection> idleConnections = new ArrayList<>();
+  // 用来存放活跃的 PooledConnection 连接
   protected final List<PooledConnection> activeConnections = new ArrayList<>();
+  // 请求数据库连接的次数
   protected long requestCount = 0;
+  // 获取连接的累计时间
   protected long accumulatedRequestTime = 0;
+  // checkoutTime 表示从连接池中获取连接到归还连接的时间
+  // accumulatedCheckoutTime 记录了所有连接的累计 checkoutTime 时长
   protected long accumulatedCheckoutTime = 0;
+  // 连接超时的连接个数
   protected long claimedOverdueConnectionCount = 0;
+  // 累计超时时间
   protected long accumulatedCheckoutTimeOfOverdueConnections = 0;
+  // 累计等待时间
   protected long accumulatedWaitTime = 0;
+  // 等待次数
   protected long hadToWaitCount = 0;
+  // 无效的连接数
   protected long badConnectionCount = 0;
 
   public PoolState(PooledDataSource dataSource) {
