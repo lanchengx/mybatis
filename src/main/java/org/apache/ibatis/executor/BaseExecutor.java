@@ -140,19 +140,24 @@ public abstract class BaseExecutor implements Executor {
   @Override
   public <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
     ErrorContext.instance().resource(ms.getResource()).activity("executing a query").object(ms.getId());
+    //检查当前executor是否关闭
     if (closed) {
       throw new ExecutorException("Executor was closed.");
     }
+    //非嵌套查询，并且FlushCache配置为true，则需要清空一级缓存
     if (queryStack == 0 && ms.isFlushCacheRequired()) {
       clearLocalCache();
     }
     List<E> list;
     try {
+      //查询层次加一
       queryStack++;
       list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
       if (list != null) {
+        //针对调用存储过程的结果处理
         handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
       } else {
+        //缓存未命中，从数据库加载数据
         list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);
       }
     } finally {
@@ -160,10 +165,12 @@ public abstract class BaseExecutor implements Executor {
     }
     if (queryStack == 0) {
       for (DeferredLoad deferredLoad : deferredLoads) {
+        //延迟加载处理
         deferredLoad.load();
       }
       // issue #601
       deferredLoads.clear();
+      //如果当前sql的一级缓存配置为STATEMENT，查询完既清空一集缓存
       if (configuration.getLocalCacheScope() == LocalCacheScope.STATEMENT) {
         // issue #482
         clearLocalCache();
