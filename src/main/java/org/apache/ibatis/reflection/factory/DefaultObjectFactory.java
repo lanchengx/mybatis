@@ -40,27 +40,49 @@ public class DefaultObjectFactory implements ObjectFactory, Serializable {
 
   private static final long serialVersionUID = -8855120656740914948L;
 
+  /**
+   * 通过无参构造器创建指定类的对象
+   * @param type
+   *          Object type
+   * @param <T>
+   * @return
+   */
   @Override
   public <T> T create(Class<T> type) {
     return create(type, null, null);
   }
 
+  /**
+   * 根据参数列表，从指定类型中选择合适的构造器创建对象
+   * @param type
+   *          Object type
+   * @param constructorArgTypes
+   *          Constructor argument types
+   * @param constructorArgs
+   *          Constructor argument values
+   * @param <T>
+   * @return
+   */
   @SuppressWarnings("unchecked")
   @Override
   public <T> T create(Class<T> type, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
+    // resolveInterface方法根据字节码Class的类型返回该类型的一个具象化实例Class
     Class<?> classToCreate = resolveInterface(type);
     // we know types are assignable
+    // 类型是可以赋值的，返回一个初始化的实例对象
     return (T) instantiateClass(classToCreate, constructorArgTypes, constructorArgs);
   }
 
   private  <T> T instantiateClass(Class<T> type, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
     try {
       Constructor<T> constructor;
+      //通过无参构造函数创建对象
       if (constructorArgTypes == null || constructorArgs == null) {
         constructor = type.getDeclaredConstructor();
         try {
           return constructor.newInstance();
         } catch (IllegalAccessException e) {
+          //如果构造方法是私有的，则设置可被访问到
           if (Reflector.canControlMemberAccessible()) {
             constructor.setAccessible(true);
             return constructor.newInstance();
@@ -69,18 +91,24 @@ public class DefaultObjectFactory implements ObjectFactory, Serializable {
           }
         }
       }
+      //根据指定的参数列好查找构造函数，并实例化对象
       constructor = type.getDeclaredConstructor(constructorArgTypes.toArray(new Class[0]));
       try {
         return constructor.newInstance(constructorArgs.toArray(new Object[0]));
       } catch (IllegalAccessException e) {
+        //如果构造方法是私有的，则设置可被访问到
         if (Reflector.canControlMemberAccessible()) {
           constructor.setAccessible(true);
+          //最后用获得的构造方法对象constructor和参数列表constructorArgs反射获取到实例对象返回
           return constructor.newInstance(constructorArgs.toArray(new Object[0]));
         } else {
           throw e;
         }
       }
     } catch (Exception e) {
+      /**
+       * 整合参数类型列表和参数列表信息，以此抛出明确的异常信息
+       */
       String argTypes = Optional.ofNullable(constructorArgTypes).orElseGet(Collections::emptyList)
           .stream().map(Class::getSimpleName).collect(Collectors.joining(","));
       String argValues = Optional.ofNullable(constructorArgs).orElseGet(Collections::emptyList)
@@ -105,6 +133,13 @@ public class DefaultObjectFactory implements ObjectFactory, Serializable {
     return classToCreate;
   }
 
+  /**
+   * 检测指定类型是否为集合类型，处理 java.util.Collection 及其子类
+   * @param type
+   *          Object type
+   * @param <T>
+   * @return
+   */
   @Override
   public <T> boolean isCollection(Class<T> type) {
     return Collection.class.isAssignableFrom(type);

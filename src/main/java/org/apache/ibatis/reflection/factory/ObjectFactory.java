@@ -29,13 +29,20 @@ public interface ObjectFactory {
    * Sets configuration properties.
    * @param properties configuration properties
    */
+  /**
+   * mybatis核心配置文件中自配置<objectFactory><property></property></objectFactory>
+   * <p>
+   * 中的property标签的内容，会在加载配置文件后，设置到Properties对象中
+   *
+   * 设置配置信息
+   */
   default void setProperties(Properties properties) {
     // NOP
   }
 
   /**
    * Creates a new object with default constructor.
-   *
+   * 通过无参构造器创建指定类的对象
    * @param <T>
    *          the generic type
    * @param type
@@ -46,15 +53,15 @@ public interface ObjectFactory {
 
   /**
    * Creates a new object with the specified constructor and params.
-   *
+   * 根据参数列表，从指定类型中选择合适的构造器创建对象
    * @param <T>
    *          the generic type
    * @param type
-   *          Object type
+   *          Object type 字节码对象Class
    * @param constructorArgTypes
-   *          Constructor argument types
+   *          Constructor argument types 构造方法中的各个参数类型
    * @param constructorArgs
-   *          Constructor argument values
+   *          Constructor argument values 构造方法中的各个参数值
    * @return the t
    */
   <T> T create(Class<T> type, List<Class<?>> constructorArgTypes, List<Object> constructorArgs);
@@ -62,7 +69,7 @@ public interface ObjectFactory {
   /**
    * Returns true if this object can have a set of other objects.
    * It's main purpose is to support non-java.util.Collection objects like Scala collections.
-   *
+   * 检测指定类型是否为集合类型，主要处理java.util.Collection及其子类
    * @param <T>
    *          the generic type
    * @param type
