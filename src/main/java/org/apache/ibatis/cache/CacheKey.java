@@ -79,6 +79,7 @@ public class CacheKey implements Cloneable, Serializable {
     return updateList.size();
   }
 
+  //调用该方法，向 updateList 集合添加对应的对象
   public void update(Object object) {
     // 如果object为null则hashCode为1
     // 不为null则调用hashCode()获取
@@ -101,7 +102,7 @@ public class CacheKey implements Cloneable, Serializable {
   }
 
   /**
-   * CacheKey采用以下顺序进行比较：
+   * 判断两个 CacheKey 是否相等
    * hashCode-->checksum-->count-->updateList
    *
    * @param object
@@ -127,7 +128,7 @@ public class CacheKey implements Cloneable, Serializable {
     if (count != cacheKey.count) {
       return false;
     }
-
+    // 如果前几项都不满足，则循环遍历 updateList 集合，判断每一项是否相等，如果有一项不相等则这两个CacheKey不相等
     for (int i = 0; i < updateList.size(); i++) {
       Object thisObject = updateList.get(i);
       Object thatObject = cacheKey.updateList.get(i);

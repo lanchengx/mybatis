@@ -20,6 +20,7 @@ import java.util.Locale;
 import org.apache.ibatis.reflection.ReflectionException;
 
 /**
+ * 主要是用于实体类中getter、setter方法与相应属性的名称转换和相应的一些检测判断操作：
  * @author Clinton Begin
  */
 public final class PropertyNamer {

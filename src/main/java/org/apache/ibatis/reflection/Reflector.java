@@ -382,6 +382,11 @@ public class Reflector {
     }
   }
 
+  /**
+   * 获取方法签名： 根据函数名称、参数和返回值类型来取得签名， 保证方法的唯一性
+   * @param method
+   * @return
+   */
   private String getSignature(Method method) {
     StringBuilder sb = new StringBuilder();
     Class<?> returnType = method.getReturnType();
@@ -398,7 +403,7 @@ public class Reflector {
 
   /**
    * Checks whether can control member accessible.
-   *
+   * 检查是否拥有了访问的权限：除了访问公有的变量， 还能访问 default , protected 和p rivate 变量
    * @return If can control member accessible, it return {@literal true}
    * @since 3.5.0
    */
@@ -416,7 +421,7 @@ public class Reflector {
 
   /**
    * Gets the name of the class the instance provides information for.
-   *
+   * 获取默认的构造函数
    * @return The class name
    */
   public Class<?> getType() {
@@ -517,6 +522,11 @@ public class Reflector {
     return getMethods.containsKey(propertyName);
   }
 
+  /**
+   * 查找是否有相应的属性
+   * @param name
+   * @return
+   */
   public String findPropertyName(String name) {
     return caseInsensitivePropertyMap.get(name.toUpperCase(Locale.ENGLISH));
   }

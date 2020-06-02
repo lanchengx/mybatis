@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 import org.apache.ibatis.reflection.Reflector;
 
 /**
+ * 主要用于相同类型的两个对象之间进行属性值的拷贝：
  * @author Clinton Begin
  */
 public final class PropertyCopier {
@@ -31,6 +32,10 @@ public final class PropertyCopier {
   public static void copyBeanProperties(Class<?> type, Object sourceBean, Object destinationBean) {
     Class<?> parent = type;
     while (parent != null) {
+      /**
+       * 获取到parent中所有被声明的字段，包括public、protected、default、private修饰的，除了
+       * 继承父类的字段
+       */
       final Field[] fields = parent.getDeclaredFields();
       for (Field field : fields) {
         try {

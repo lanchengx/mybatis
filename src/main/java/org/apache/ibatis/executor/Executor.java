@@ -34,28 +34,39 @@ public interface Executor {
 
   ResultHandler NO_RESULT_HANDLER = null;
 
+  // insert | update | delete 的操作方法
   int update(MappedStatement ms, Object parameter) throws SQLException;
 
+  // 查询，带分页，带缓存
   <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey cacheKey, BoundSql boundSql) throws SQLException;
 
+  // 查询，带分页
   <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException;
 
+  // 查询存储过程
   <E> Cursor<E> queryCursor(MappedStatement ms, Object parameter, RowBounds rowBounds) throws SQLException;
 
+  //刷新批处理语句
   List<BatchResult> flushStatements() throws SQLException;
 
+  // 事务提交
   void commit(boolean required) throws SQLException;
 
+  // 事务回滚
   void rollback(boolean required) throws SQLException;
 
+  // 创建缓存的key
   CacheKey createCacheKey(MappedStatement ms, Object parameterObject, RowBounds rowBounds, BoundSql boundSql);
 
+  // 是否缓存
   boolean isCached(MappedStatement ms, CacheKey key);
 
   void clearLocalCache();
 
+  // 延迟加载
   void deferLoad(MappedStatement ms, MetaObject resultObject, String property, CacheKey key, Class<?> targetType);
 
+  // 获取事务
   Transaction getTransaction();
 
   void close(boolean forceRollback);
