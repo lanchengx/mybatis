@@ -244,7 +244,7 @@ class PooledConnection implements InvocationHandler {
 
   /**
    * Required for InvocationHandler implementation.
-   *
+   * 该方法是 proxyConnection 这个连接代理对象的真正代理逻辑，它会对 close 方法进行代理，并且在调用真正的连接之前对连接进行检测。
    * @param proxy
    *          - not used
    * @param method
