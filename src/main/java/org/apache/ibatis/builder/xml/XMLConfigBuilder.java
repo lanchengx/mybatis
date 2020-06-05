@@ -132,15 +132,20 @@ public class XMLConfigBuilder extends BaseBuilder {
             typeAliasesElement(root.evalNode("typeAliases"));
             // 解析插件
             pluginElement(root.evalNode("plugins"));
+            // 自定义对象工程加载
             objectFactoryElement(root.evalNode("objectFactory"));
             objectWrapperFactoryElement(root.evalNode("objectWrapperFactory"));
             reflectorFactoryElement(root.evalNode("reflectorFactory"));
+
+            // mybatis 设置
             settingsElement(settings);
             // read it after objectFactory and objectWrapperFactory issue #631
             environmentsElement(root.evalNode("environments"));
+            //解析databaseIdProvider元素，配置数据库类型唯一标志生成器
             databaseIdProviderElement(root.evalNode("databaseIdProvider"));
+
             typeHandlerElement(root.evalNode("typeHandlers"));
-            // 解析mapper
+            // !! 解析mapper
             mapperElement(root.evalNode("mappers"));
         } catch (Exception e) {
             throw new BuilderException("Error parsing SQL Mapper Configuration. Cause: " + e, e);
@@ -237,11 +242,25 @@ public class XMLConfigBuilder extends BaseBuilder {
         }
     }
 
+    /**
+     *   <configuration>
+     *     ......
+     *     <objectFactory type="org.mybatis.example.ExampleObjectFactory">
+     *         <property name="someProperty" value="100"/>
+     *     </objectFactory>
+     *     ......
+     *   </configuration
+     * @param context
+     * @throws Exception
+     */
     private void objectFactoryElement(XNode context) throws Exception {
         if (context != null) {
             String type = context.getStringAttribute("type");
+            // 工厂属性
             Properties properties = context.getChildrenAsProperties();
+            // 反射出工厂对象
             ObjectFactory factory = (ObjectFactory) resolveClass(type).getDeclaredConstructor().newInstance();
+            // 设置属性
             factory.setProperties(properties);
             configuration.setObjectFactory(factory);
         }
@@ -317,15 +336,23 @@ public class XMLConfigBuilder extends BaseBuilder {
 
     private void environmentsElement(XNode context) throws Exception {
         if (context != null) {
+            // 得到默认的JDBC环境名称
             if (environment == null) {
                 environment = context.getStringAttribute("default");
             }
+            //遍历<environments>标签下的每一个<environment>标签
             for (XNode child : context.getChildren()) {
+                // 获取<environment>下的id属性
                 String id = child.getStringAttribute("id");
+                // 判断当前的<environment>是不是默认的JDBC环境
                 if (isSpecifiedEnvironment(id)) {
+                    //根据<transactionManager>标签获取事物管理器
                     TransactionFactory txFactory = transactionManagerElement(child.evalNode("transactionManager"));
+                    //根据<dataSource>标签获取数据源工厂DataSourceFactory
                     DataSourceFactory dsFactory = dataSourceElement(child.evalNode("dataSource"));
+                    // 根据DataSourceFactory获取DataSource
                     DataSource dataSource = dsFactory.getDataSource();
+                    // 使用内部类构建的方式根据TransactionFactory和DataSource创建一个Environment并设置到Configuration
                     Environment.Builder environmentBuilder = new Environment.Builder(id)
                             .transactionFactory(txFactory)
                             .dataSource(dataSource);
@@ -335,6 +362,11 @@ public class XMLConfigBuilder extends BaseBuilder {
         }
     }
 
+    /**
+     * 解析 databaseIdProvider节点
+     *
+     * @param context databaseIdProvider节点
+     */
     private void databaseIdProviderElement(XNode context) throws Exception {
         DatabaseIdProvider databaseIdProvider = null;
         if (context != null) {
@@ -343,13 +375,19 @@ public class XMLConfigBuilder extends BaseBuilder {
             if ("VENDOR".equals(type)) {
                 type = "DB_VENDOR";
             }
+            // 获取用户定义的数据库类型和databaseId的配置
             Properties properties = context.getChildrenAsProperties();
+            // 获取databaseIdProvider实例
             databaseIdProvider = (DatabaseIdProvider) resolveClass(type).getDeclaredConstructor().newInstance();
+            // 配置数据库类型和databaseId的对应关系
             databaseIdProvider.setProperties(properties);
         }
+        // 获取Environment容器
         Environment environment = configuration.getEnvironment();
         if (environment != null && databaseIdProvider != null) {
+            // 获取当前环境的databaseId
             String databaseId = databaseIdProvider.getDatabaseId(environment.getDataSource());
+            // 同步configuration#databaseId的值
             configuration.setDatabaseId(databaseId);
         }
     }
@@ -410,9 +448,13 @@ public class XMLConfigBuilder extends BaseBuilder {
                     String mapperPackage = child.getStringAttribute("name");
                     configuration.addMappers(mapperPackage);
                 } else {
+                    //读取<mapper resource="mapper/userDao-mapping.xml"/>中的mapper/userDao-mapping.xml,即resource = "mapper/userDao-mapping.xml"
                     String resource = child.getStringAttribute("resource");
+                    //读取mapper节点的url属性
                     String url = child.getStringAttribute("url");
+                    //读取mapper节点的class属性
                     String mapperClass = child.getStringAttribute("class");
+                    ////根据resource加载mapper文件
                     if (resource != null && url == null && mapperClass == null) {
                         ErrorContext.instance().resource(resource);
                         InputStream inputStream = Resources.getResourceAsStream(resource);
@@ -434,6 +476,11 @@ public class XMLConfigBuilder extends BaseBuilder {
         }
     }
 
+    /**
+     * <environments>标签下的default属性是一个必填属性
+     * @param id
+     * @return
+     */
     private boolean isSpecifiedEnvironment(String id) {
         if (environment == null) {
             throw new BuilderException("No environment specified.");

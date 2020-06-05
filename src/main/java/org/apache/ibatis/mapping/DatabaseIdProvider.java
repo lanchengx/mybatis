@@ -24,7 +24,8 @@ import javax.sql.DataSource;
  * Should return an id to identify the type of this database.
  * That id can be used later on to build different queries for each database type
  * This mechanism enables supporting multiple vendors or versions
- *
+ * 该接口的作用是获取不同数据源在mybatis中的唯一标志。
+ * 在需要使用多数据库特性的时候，可以实现该接口来构建自己的DatabaseIdProvider
  * @author Eduardo Macarron
  */
 public interface DatabaseIdProvider {
