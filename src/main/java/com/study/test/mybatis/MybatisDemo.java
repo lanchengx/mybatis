@@ -17,6 +17,11 @@ import java.util.Set;
 
 import javax.jws.soap.SOAPBinding.Use;
 
+import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.plugins.pagination.PageHelper;
+import com.study.test.entity.TPosition;
+import com.study.test.entity.TUser;
+import com.study.test.entity.TUserTest;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.reflection.DefaultReflectorFactory;
 import org.apache.ibatis.reflection.MetaObject;
@@ -36,26 +41,6 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.Before;
 import org.junit.Test;
-import org.mybatis.generator.api.MyBatisGenerator;
-import org.mybatis.generator.config.Configuration;
-import org.mybatis.generator.config.xml.ConfigurationParser;
-import org.mybatis.generator.exception.InvalidConfigurationException;
-import org.mybatis.generator.exception.XMLParserException;
-import org.mybatis.generator.internal.DefaultShellCallback;
-import org.springframework.test.annotation.Commit;
-import org.springframework.test.annotation.Rollback;
-
-import com.enjoylearning.mybatis.entity.EmailSexBean;
-import com.enjoylearning.mybatis.entity.THealthReportFemale;
-import com.enjoylearning.mybatis.entity.TJobHistory;
-import com.enjoylearning.mybatis.entity.TPosition;
-import com.enjoylearning.mybatis.entity.TUser;
-import com.enjoylearning.mybatis.mapper.THealthReportFemaleMapper;
-import com.enjoylearning.mybatis.mapper.TJobHistoryAnnoMapper;
-import com.enjoylearning.mybatis.mapper.TUserMapper;
-import com.enjoylearning.mybatis.mapper.TUserTestMapper;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 
 public class MybatisDemo {
 
@@ -116,8 +101,8 @@ public class MybatisDemo {
 		TUserTestMapper mapper = sqlSession.getMapper(TUserTestMapper.class);
 		// 4.执行查询语句并返回多条数据
 
-		List<TUser> users = mapper.selectAll();
-		for (TUser tUser : users) {
+		List<TUserTest> users = mapper.selectAll();
+		for (TUserTest tUser : users) {
 			System.out.println(tUser);
 		}
 
@@ -164,9 +149,9 @@ public class MybatisDemo {
 //		System.out.println(list1.size());
 
 		// 第二种方式直接使用参数
-		Page<TUser> startPage = PageHelper.startPage(2, 3);
-		List<TUser> list2 = mapper.selectByEmailAndSex2(email, sex);
-		System.out.println(list2.size());
+//		Page<TUser> startPage = PageHelper.startPage(2, 3);
+//		List<TUser> list2 = mapper.selectByEmailAndSex2(email, sex);
+//		System.out.println(list2.size());
 //		return startPage;
 
 		// 第三种方式用对象
@@ -391,38 +376,38 @@ public class MybatisDemo {
 
 
 
-	@Test
-	public void mybatisGeneratorTest() throws FileNotFoundException{
-		List<String> warnings = new ArrayList<String>(); //警告信息list
-        boolean overwrite = true;
-        String genCfg = "generatorConfig.xml";
-        File configFile = new File(getClass().getClassLoader().getResource(genCfg).getFile());
-        ConfigurationParser cp = new ConfigurationParser(warnings);
-        Configuration config = null;
-        try {
-            config = cp.parseConfiguration(configFile);//读取配置文件
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (XMLParserException e) {
-            e.printStackTrace();
-        }
-        DefaultShellCallback callback = new DefaultShellCallback(overwrite);
-        MyBatisGenerator myBatisGenerator = null;
-        try {
-            myBatisGenerator = new MyBatisGenerator(config, callback, warnings);//实例化生成器
-        } catch (InvalidConfigurationException e) {
-            e.printStackTrace();
-        }
-        try {
-            myBatisGenerator.generate(null); //生成实体bean，生成mapper接口 和xml
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
+//	@Test
+//	public void mybatisGeneratorTest() throws FileNotFoundException{
+//		List<String> warnings = new ArrayList<String>(); //警告信息list
+//        boolean overwrite = true;
+//        String genCfg = "generatorConfig.xml";
+//        File configFile = new File(getClass().getClassLoader().getResource(genCfg).getFile());
+//        ConfigurationParser cp = new ConfigurationParser(warnings);
+//        Configuration config = null;
+//        try {
+//            config = cp.parseConfiguration(configFile);//读取配置文件
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (XMLParserException e) {
+//            e.printStackTrace();
+//        }
+//        DefaultShellCallback callback = new DefaultShellCallback(overwrite);
+//        MyBatisGenerator myBatisGenerator = null;
+//        try {
+//            myBatisGenerator = new MyBatisGenerator(config, callback, warnings);//实例化生成器
+//        } catch (InvalidConfigurationException e) {
+//            e.printStackTrace();
+//        }
+//        try {
+//            myBatisGenerator.generate(null); //生成实体bean，生成mapper接口 和xml
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 
 
