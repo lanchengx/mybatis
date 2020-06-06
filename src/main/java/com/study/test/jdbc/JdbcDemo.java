@@ -1,7 +1,7 @@
 package com.study.test.jdbc;
 //STEP 1. 导入sql相关的包
 import com.study.test.entity.TUser;
-import org.junit.Test;
+import org.testng.annotations.AfterTest;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -23,7 +23,7 @@ public class JdbcDemo {
 
 
 
-	@Test
+	@AfterTest
 	public void QueryPreparedStatementDemo() {
 		Connection conn = null;
 		PreparedStatement stmt = null;
