@@ -379,7 +379,7 @@ public class XNode {
 
     /**
      *  该方法是解析当前节点下所有子节点的属性值，
-     * 并把其中name属性和value属性的属性值，转换成Properties形式的键值对。
+     *  并把其中name属性和value属性的属性值，转换成Properties形式的键值对。
      * @return
      */
     public Properties getChildrenAsProperties() {

@@ -1,17 +1,17 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2019 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.session;
 
@@ -32,64 +32,68 @@ import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
  */
 public class SqlSessionFactoryBuilder {
 
-  public SqlSessionFactory build(Reader reader) {
-    return build(reader, null, null);
-  }
-
-  public SqlSessionFactory build(Reader reader, String environment) {
-    return build(reader, environment, null);
-  }
-
-  public SqlSessionFactory build(Reader reader, Properties properties) {
-    return build(reader, null, properties);
-  }
-
-  public SqlSessionFactory build(Reader reader, String environment, Properties properties) {
-    try {
-      XMLConfigBuilder parser = new XMLConfigBuilder(reader, environment, properties);
-      return build(parser.parse());
-    } catch (Exception e) {
-      throw ExceptionFactory.wrapException("Error building SqlSession.", e);
-    } finally {
-      ErrorContext.instance().reset();
-      try {
-        reader.close();
-      } catch (IOException e) {
-        // Intentionally ignore. Prefer previous error.
-      }
+    public SqlSessionFactory build(Reader reader) {
+        return build(reader, null, null);
     }
-  }
 
-  public SqlSessionFactory build(InputStream inputStream) {
-    return build(inputStream, null, null);
-  }
-
-  public SqlSessionFactory build(InputStream inputStream, String environment) {
-    return build(inputStream, environment, null);
-  }
-
-  public SqlSessionFactory build(InputStream inputStream, Properties properties) {
-    return build(inputStream, null, properties);
-  }
-
-  public SqlSessionFactory build(InputStream inputStream, String environment, Properties properties) {
-    try {
-      XMLConfigBuilder parser = new XMLConfigBuilder(inputStream, environment, properties);
-      return build(parser.parse());
-    } catch (Exception e) {
-      throw ExceptionFactory.wrapException("Error building SqlSession.", e);
-    } finally {
-      ErrorContext.instance().reset();
-      try {
-        inputStream.close();
-      } catch (IOException e) {
-        // Intentionally ignore. Prefer previous error.
-      }
+    public SqlSessionFactory build(Reader reader, String environment) {
+        return build(reader, environment, null);
     }
-  }
 
-  public SqlSessionFactory build(Configuration config) {
-    return new DefaultSqlSessionFactory(config);
-  }
+    public SqlSessionFactory build(Reader reader, Properties properties) {
+        return build(reader, null, properties);
+    }
+
+    public SqlSessionFactory build(Reader reader, String environment, Properties properties) {
+        try {
+            // 根据Reader创建XMLConfigBuilder即解析器对象parser。
+            XMLConfigBuilder parser = new XMLConfigBuilder(reader, environment, properties);
+            // 调用parser对象的parse方法，parser.parse()，该结果将返回一个Configuration配置对象，作为build方法的参数。
+            return build(parser.parse());
+        } catch (Exception e) {
+            throw ExceptionFactory.wrapException("Error building SqlSession.", e);
+        } finally {
+            ErrorContext.instance().reset();
+            try {
+                reader.close();
+            } catch (IOException e) {
+                // Intentionally ignore. Prefer previous error.
+            }
+        }
+    }
+
+    public SqlSessionFactory build(InputStream inputStream) {
+        return build(inputStream, null, null);
+    }
+
+    public SqlSessionFactory build(InputStream inputStream, String environment) {
+        return build(inputStream, environment, null);
+    }
+
+    public SqlSessionFactory build(InputStream inputStream, Properties properties) {
+        return build(inputStream, null, properties);
+    }
+
+    public SqlSessionFactory build(InputStream inputStream, String environment, Properties properties) {
+        try {
+            // 根据字节输入流创建XMLConfigBuilder即解析器对象parser。
+            XMLConfigBuilder parser = new XMLConfigBuilder(inputStream, environment, properties);
+            // 调用parser对象的parse方法，parser.parse()，该结果将返回一个Configuration配置对象，作为build方法的参数。
+            return build(parser.parse());
+        } catch (Exception e) {
+            throw ExceptionFactory.wrapException("Error building SqlSession.", e);
+        } finally {
+            ErrorContext.instance().reset();
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                // Intentionally ignore. Prefer previous error.
+            }
+        }
+    }
+
+    public SqlSessionFactory build(Configuration config) {
+        return new DefaultSqlSessionFactory(config);
+    }
 
 }

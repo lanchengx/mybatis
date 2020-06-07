@@ -29,6 +29,8 @@ import org.apache.ibatis.logging.LogFactory;
 
 /**
  * Provides a very simple API for accessing resources within an application server.
+ * 提供了一个非常简单的API  访问应用服务器内资源
+ * 虚拟文件系统
  *
  * @author Ben Gunter
  */

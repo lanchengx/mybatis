@@ -232,9 +232,10 @@ public class XPathParser {
 
     private Object evaluate(String expression, Object root, QName returnType) {
         try {
-            //计算指定上下文中的 XPath 表达式并返回指定类型的结果。
-            //如果 returnType 不是 XPathConstants (NUMBER、STRING、BOOLEAN、NODE 或 NODESET) 中定义的某种类型，则抛出 IllegalArgumentException。
-            //如果 item 为 null 值，则将使用一个空文档作为上下文。如果 expression 或 returnType 为 null，则抛出 NullPointerException。
+            // 计算指定上下文中的 XPath 表达式并返回指定类型的结果。
+            // 如果 returnType 不是 XPathConstants (NUMBER、STRING、BOOLEAN、NODE 或 NODESET) 中定义的某种类型，则抛出 IllegalArgumentException。
+            // 如果 root 为 null 值，则将使用一个空文档作为上下文。
+            // 如果 expression 或 returnType 为 null，则抛出 NullPointerException。
             return xpath.evaluate(expression, root, returnType);
         } catch (Exception e) {
             throw new BuilderException("Error evaluating XPath.  Cause: " + e, e);
