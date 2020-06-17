@@ -31,13 +31,17 @@ import org.apache.ibatis.session.RowBounds;
 
 /**
  * @author Clinton Begin
+ *  * Excutor组件真正实例化的子类，使用静态代理模式，根据上下文决定创建哪个具体实体类；
  */
 public class RoutingStatementHandler implements StatementHandler {
 
+  //底层封装的真正的StatementHandler对象
   private final StatementHandler delegate;
 
-  public RoutingStatementHandler(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
+  public RoutingStatementHandler(Executor executor, MappedStatement ms, Object parameter,
+                                 RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
 
+    //RoutingStatementHandler最主要的功能就是根据mappedStatment的配置，生成一个对应的StatementHandler对象并赋值给delegate
     switch (ms.getStatementType()) {
       case STATEMENT:
         delegate = new SimpleStatementHandler(executor, ms, parameter, rowBounds, resultHandler, boundSql);
