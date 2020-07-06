@@ -21,10 +21,13 @@ import java.util.Map;
 import org.apache.ibatis.cache.decorators.TransactionalCache;
 
 /**
+ * 用来管理 CachingExecutor 使用的二级缓存
  * @author Clinton Begin
  */
 public class TransactionalCacheManager {
 
+  // key 为对应的CachingExecutor 使用的二级缓存
+  // value 为对应的 TransactionalCache 对象
   private final Map<Cache, TransactionalCache> transactionalCaches = new HashMap<>();
 
   public void clear(Cache cache) {
@@ -50,7 +53,7 @@ public class TransactionalCacheManager {
       txCache.rollback();
     }
   }
-
+  // 所有的调用都会调用 TransactionalCache 的方法来实现
   private TransactionalCache getTransactionalCache(Cache cache) {
     return transactionalCaches.computeIfAbsent(cache, TransactionalCache::new);
   }

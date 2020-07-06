@@ -39,9 +39,13 @@ public class TransactionalCache implements Cache {
 
   private static final Log log = LogFactory.getLog(TransactionalCache.class);
 
+  // 底层封装的二级缓存对应的Cache对象
   private final Cache delegate;
+  // 为true时，表示当前的 TransactionalCache 不可查询，且提交事务时会清空缓存
   private boolean clearOnCommit;
+  // 存放需要添加到二级缓存中的数据
   private final Map<Object, Object> entriesToAddOnCommit;
+  // 存放为命中缓存的 CacheKey 对象
   private final Set<Object> entriesMissedInCache;
 
   public TransactionalCache(Cache delegate) {
@@ -76,6 +80,7 @@ public class TransactionalCache implements Cache {
     }
   }
 
+  // 添加缓存数据的时候，先暂时放到 entriesToAddOnCommit 集合中，在事务提交的时候，再把数据放入到二级缓存中，避免脏数据
   @Override
   public void putObject(Object key, Object object) {
     entriesToAddOnCommit.put(key, object);
@@ -92,15 +97,19 @@ public class TransactionalCache implements Cache {
     entriesToAddOnCommit.clear();
   }
 
+  // 提交事务，
   public void commit() {
     if (clearOnCommit) {
       delegate.clear();
     }
+    // 把 entriesToAddOnCommit  集合中的数据放入到二级缓存中
     flushPendingEntries();
     reset();
   }
 
+  // 事务回滚
   public void rollback() {
+    // 把未命中缓存的数据清除掉
     unlockMissedEntries();
     reset();
   }
@@ -111,6 +120,7 @@ public class TransactionalCache implements Cache {
     entriesMissedInCache.clear();
   }
 
+  // 把 entriesToAddOnCommit  集合中的数据放入到二级缓存中
   private void flushPendingEntries() {
     for (Map.Entry<Object, Object> entry : entriesToAddOnCommit.entrySet()) {
       delegate.putObject(entry.getKey(), entry.getValue());

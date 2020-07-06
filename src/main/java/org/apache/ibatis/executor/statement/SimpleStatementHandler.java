@@ -83,15 +83,18 @@ public class SimpleStatementHandler extends BaseStatementHandler {
   }
 
   @Override
+  //使用底层的statment对象来完成对数据库的操作
   protected Statement instantiateStatement(Connection connection) throws SQLException {
     if (mappedStatement.getResultSetType() == ResultSetType.DEFAULT) {
       return connection.createStatement();
     } else {
+      //设置结果集是否可以滚动以及其游标是否可以上下移动，设置结果集是否可更新
       return connection.createStatement(mappedStatement.getResultSetType().getValue(), ResultSet.CONCUR_READ_ONLY);
     }
   }
 
   @Override
+  // 非预编译模式不需要处理占位符
   public void parameterize(Statement statement) {
     // N/A
   }

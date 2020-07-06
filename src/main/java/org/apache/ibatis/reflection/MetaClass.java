@@ -1,17 +1,17 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2020 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.reflection;
 
@@ -34,7 +34,7 @@ public class MetaClass {
   //用于缓存Reflector对象
   private final ReflectorFactory reflectorFactory;
   //在创建MetaClasyos时会指定一个类，该Reflector对象会用于记录该类相关的元数据
-    private final Reflector reflector;
+  private final Reflector reflector;
 
   //MetaClass的构造方法是使用private修饰的
   private MetaClass(Class<?> type, ReflectorFactory reflectorFactory) {
@@ -51,7 +51,7 @@ public class MetaClass {
   public MetaClass metaClassForProperty(String name) {
     //查找指定属性对应的class
     Class<?> propType = reflector.getGetterType(name);
-    //为改属性创建对应的MetaClass对象
+    //为该属性创建对应的MetaClass对象
     return MetaClass.forClass(propType, reflectorFactory);
   }
 

@@ -31,6 +31,7 @@ public class MapperProxyFactory<T> {
   private final Class<T> mapperInterface;
   private final Map<Method, MapperMethodInvoker> methodCache = new ConcurrentHashMap<>();
 
+  // 当前的 MapperProxyFactory 对象可以创建的 mapperInterface 接口的代理对象
   public MapperProxyFactory(Class<T> mapperInterface) {
     this.mapperInterface = mapperInterface;
   }
@@ -39,11 +40,13 @@ public class MapperProxyFactory<T> {
     return mapperInterface;
   }
 
+  // MapperMetho缓存
   public Map<Method, MapperMethodInvoker> getMethodCache() {
     return methodCache;
   }
 
   @SuppressWarnings("unchecked")
+  // 创建 mapperInterface 的代理对象
   protected T newInstance(MapperProxy<T> mapperProxy) {
     return (T) Proxy.newProxyInstance(mapperInterface.getClassLoader(), new Class[] { mapperInterface }, mapperProxy);
   }

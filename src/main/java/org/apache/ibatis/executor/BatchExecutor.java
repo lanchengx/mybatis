@@ -79,8 +79,8 @@ public class BatchExecutor extends BaseExecutor {
   }
 
   @Override
-  public <E> List<E> doQuery(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql)
-      throws SQLException {
+  public <E> List<E> doQuery(MappedStatement ms, Object parameterObject, RowBounds rowBounds,
+                             ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
     Statement stmt = null;
     try {
       flushStatements();

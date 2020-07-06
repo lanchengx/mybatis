@@ -18,6 +18,7 @@ package org.apache.ibatis.reflection.property;
 import java.util.Iterator;
 
 /**
+ * 主要用来解析Mybatis使用过程中遇到的类似"order[0].items[0].name"这种由"."和"[ ]"组成的表达式
  * @author Clinton Begin
  */
 public class PropertyTokenizer implements Iterator<PropertyTokenizer> {

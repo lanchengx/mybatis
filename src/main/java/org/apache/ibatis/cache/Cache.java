@@ -43,10 +43,13 @@ public interface Cache {
 
   /**
    * @return The identifier of this cache
+   * 获取缓存的id，即 namespace
    */
   String getId();
 
   /**
+   *
+   * 添加缓存
    * @param key
    *          Can be any object but usually it is a {@link CacheKey}
    * @param value
@@ -55,6 +58,8 @@ public interface Cache {
   void putObject(Object key, Object value);
 
   /**
+   *
+   * 根据key来获取缓存对应的值
    * @param key
    *          The key
    * @return The object stored in the cache.
@@ -71,7 +76,7 @@ public interface Cache {
    * This way other threads will wait for the value to be
    * available instead of hitting the database.
    *
-   *
+   * 删除key对应的缓存
    * @param key
    *          The key
    * @return Not used
@@ -79,11 +84,13 @@ public interface Cache {
   Object removeObject(Object key);
 
   /**
+   * 清空缓存
    * Clears this cache instance.
    */
   void clear();
 
   /**
+   * 获取缓存中数据的大小
    * Optional. This method is not called by the core.
    *
    * @return The number of elements stored in the cache (not its capacity).
@@ -91,6 +98,7 @@ public interface Cache {
   int getSize();
 
   /**
+   * 取得读写锁, 从3.2.6开始没用了
    * Optional. As of 3.2.6 this method is no longer called by the core.
    * <p>
    * Any locking needed by the cache must be provided internally by the cache provider.

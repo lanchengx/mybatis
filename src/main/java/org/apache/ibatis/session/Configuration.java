@@ -102,30 +102,113 @@ public class Configuration {
 
     protected Environment environment;
 
+    /**
+     * 允许在嵌套语句中使用分页（RowBounds）。如果允许使用则设置为 false。
+     */
     protected boolean safeRowBoundsEnabled;
+    /**
+     * 允许在嵌套语句中使用分页（ResultHandler）。如果允许使用则设置为 false。
+     */
     protected boolean safeResultHandlerEnabled = true;
+    /**
+     *    是否开启自动驼峰命名规则（camel case）映射，即从经典数据库列名 A_COLUMN 到经典 Java 属性名 aColumn 的类似映射。
+     */
     protected boolean mapUnderscoreToCamelCase;
+    /**
+     * 当开启时，任何方法的调用都会加载该对象的所有属性。 否则，每个属性会按需加载（参考 lazyLoadTriggerMethods)。
+     * 默认为false （在 3.4.1 及之前的版本默认值为 true）
+     */
     protected boolean aggressiveLazyLoading;
+    /**
+     * 是否允许单一语句返回多结果集（需要驱动支持）。
+     */
     protected boolean multipleResultSetsEnabled = true;
+    /**
+     * 允许 JDBC 支持自动生成主键，需要驱动支持。 如果设置为 true 则这个设置强制使用自动生成主键，尽管一些驱动不能支持但仍可正常工作（比如 Derby）
+     */
     protected boolean useGeneratedKeys;
+    /**
+     * 使用列标签代替列名。不同的驱动在这方面会有不同的表现，具体可参考相关驱动文档或通过测试这两种不同的模式来观察所用驱动的结果。
+     * <p>
+     *     isUseColumnLabel，默认为true。根据Javadoc，这个ColumnLabel就是AS后的那个名字，如果没有AS的话，就是获取的原生的字段名
+     * </p>
+     */
     protected boolean useColumnLabel = true;
+    /**
+     * 全局地开启或关闭配置文件中的所有映射器已经配置的任何缓存。默认开启
+     */
     protected boolean cacheEnabled = true;
+    /**
+     * 指定当结果集中值为 null 的时候是否调用映射对象的 setter（map 对象时为 put）方法，
+     * 这在依赖于 Map.keySet() 或 null 值初始化的时候比较有用。注意基本类型（int、boolean 等）是不能设置成 null 的。
+     */
     protected boolean callSettersOnNulls;
+    /**
+     * 允许使用构造函数的参数名作为语句参数名称。
+     * 为了使用该特性，你的项目必须采用 Java 8 编译。
+     */
     protected boolean useActualParamName = true;
+    /**
+     * 当返回行的所有列都是空时，MyBatis默认返回 null。
+     * 当开启这个设置时，MyBatis会返回一个空实例。 请注意，它也适用于嵌套的结果集 （如集合或关联）。（新增于 3.4.2）
+     */
     protected boolean returnInstanceForEmptyRow;
     protected boolean shrinkWhitespacesInSql;
 
     protected String logPrefix;
     protected Class<? extends Log> logImpl;
+    /**
+     * VFS(virtual File System)的作用就是采用标准的Unix系统调用读写位于不同物理介质上的不同文件系统,
+     * 即为各类文件系统提供了一个统一的操作界面和应用编程接口
+     */
     protected Class<? extends VFS> vfsImpl;
+    /**
+     * 本地缓存作用域
+     * <ol>
+     *     <li>LocalCacheScope.SESSION：数据库对象</li>
+     *     <li>LocalCacheScope.STATEMENT:SQL腳本</li>
+     * </ol>
+     */
     protected LocalCacheScope localCacheScope = LocalCacheScope.SESSION;
+    /**
+     * null对应jdbcType
+     */
     protected JdbcType jdbcTypeForNull = JdbcType.OTHER;
+    /**
+     * 指定哪个对象的方法触发一次延迟加载。默认方法为：equals,clone,hashCode,toString
+     */
     protected Set<String> lazyLoadTriggerMethods = new HashSet<>(Arrays.asList("equals", "clone", "hashCode", "toString"));
+    /**
+     *设置超时时间，它决定驱动等待数据库响应的秒数。
+     */
     protected Integer defaultStatementTimeout;
+    /**
+     * 为驱动的结果集获取数量（fetchSize）设置一个提示值。此参数只可以在查询设置中被覆盖。
+     */
     protected Integer defaultFetchSize;
     protected ResultSetType defaultResultSetType;
+    /**
+     * 配置默认的执行器。
+     * <ul>
+     *     <li>SIMPLE 就是普通的执行器，默认；</li>
+     *     <li>REUSE 执行器会重用预处理语句（prepared statements）；</li>
+     *     <li>BATCH 执行器将重用语句并执行批量更新</li>
+     * </ul>
+     */
     protected ExecutorType defaultExecutorType = ExecutorType.SIMPLE;
+    /**
+     * 指定 MyBatis 应如何自动映射列到字段或属性。 NONE 表示取消自动映射；
+     * PARTIAL 只会自动映射没有定义嵌套结果集映射的结果集。 FULL 会自动映射任意复杂的结果集（无论是否嵌套）。
+     */
     protected AutoMappingBehavior autoMappingBehavior = AutoMappingBehavior.PARTIAL;
+    /**
+     * 指定发现自动映射目标未知列（或者未知属性类型）的行为。
+     * <ol>
+     *     <li>AutoMappingUnknownColumnBehavior.NONE:不做任何反应</li>
+     *     <li>AutoMappingUnknownColumnBehavior.WARNING:输出提醒日志</li>
+     *     <li>AutoMappingUnknownColumnBehavior.FAILING:映射失败 (抛出 SqlSessionException)</li>
+     * </ol>
+     */
     protected AutoMappingUnknownColumnBehavior autoMappingUnknownColumnBehavior = AutoMappingUnknownColumnBehavior.NONE;
 
     protected Properties variables = new Properties();
@@ -133,9 +216,20 @@ public class Configuration {
     protected ObjectFactory objectFactory = new DefaultObjectFactory();
     protected ObjectWrapperFactory objectWrapperFactory = new DefaultObjectWrapperFactory();
 
+    /**
+     * 延迟加载的全局开关。当开启时，所有关联对象都会延迟加载。 特定关联关系中可通过设置fetchType属性来覆盖该项的开关状态。
+     */
     protected boolean lazyLoadingEnabled = false;
+    /**
+     * Javassist代理工厂
+     */
     protected ProxyFactory proxyFactory = new JavassistProxyFactory(); // #224 Using internal Javassist instead of OGNL
-
+    /**
+     * 当前项目引用的dataBaseId
+     * <p>
+     *     dataBaseId的作用：使得引用mybatis的项目，根据不同的数据库进行编写对应的数据库SQL
+     * </p>
+     */
     protected String databaseId;
     /**
      * Configuration factory class.
@@ -143,28 +237,80 @@ public class Configuration {
      *
      * @see <a href='https://code.google.com/p/mybatis/issues/detail?id=300'>Issue 300 (google code)</a>
      */
+    /**
+     *  用户获取数据库连接的工厂类
+     * Configuration factory class.
+     * Used to create Configuration for loading deserialized unread properties.
+     * 用于创建配置加载反序列化未读属性。;
+     * @see <a href='https://code.google.com/p/mybatis/issues/detail?id=300'>Issue 300 (google code)</a>
+     */
     protected Class<?> configurationFactory;
 
+    /**
+     * 映射器 注册类
+     */
     protected final MapperRegistry mapperRegistry = new MapperRegistry(this);
+    /**
+     * 拦截器链
+     */
     protected final InterceptorChain interceptorChain = new InterceptorChain();
+    /**
+     * 类型 处理 注册器
+     */
     protected final TypeHandlerRegistry typeHandlerRegistry = new TypeHandlerRegistry(this);
+    /**
+     * 类型别名注册器
+     */
     protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
+    /**
+     * 语言驱动注册器
+     */
     protected final LanguageDriverRegistry languageRegistry = new LanguageDriverRegistry();
 
     protected final Map<String, MappedStatement> mappedStatements = new StrictMap<MappedStatement>("Mapped Statements collection")
             .conflictMessageProducer((savedValue, targetValue) ->
                     ". please check " + savedValue.getResource() + " and " + targetValue.getResource());
+    /**
+     * Mapper.xml的命名空间 - Cache实例【是一个经历了一层又一层装饰得到的装饰类】
+     */
     protected final Map<String, Cache> caches = new StrictMap<>("Caches collection");
+    /**
+     * resultMap的StrictMap
+     */
     protected final Map<String, ResultMap> resultMaps = new StrictMap<>("Result Maps collection");
+    /**
+     * Mapper.xml的ParameterMap标签信息。 key=ParameterMap标签的ID,value=ParameterMap标签的内容。
+     */
     protected final Map<String, ParameterMap> parameterMaps = new StrictMap<>("Parameter Maps collection");
+    /**
+     * KeyGentertos的StrictMap
+     */
     protected final Map<String, KeyGenerator> keyGenerators = new StrictMap<>("Key Generators collection");
 
+    /**
+     * 加载资源,就是mapper.xml
+     */
     protected final Set<String> loadedResources = new HashSet<>();
+    /**
+     * 存放着SQL的StrictMap
+     */
     protected final Map<String, XNode> sqlFragments = new StrictMap<>("XML fragments parsed from previous mappers");
 
+    /**
+     * XML Statment 构建类 集合LinkedList
+     */
     protected final Collection<XMLStatementBuilder> incompleteStatements = new LinkedList<>();
+    /**
+     * 解析CacheRef失败的{@link CacheRefResolver} 集合LinkedList
+     */
     protected final Collection<CacheRefResolver> incompleteCacheRefs = new LinkedList<>();
+    /**
+     * 结果映射解析 集合LinkedList，存放着构建ResultMap时抛出BuilderException异常的resultMapResolver实例
+     */
     protected final Collection<ResultMapResolver> incompleteResultMaps = new LinkedList<>();
+    /**
+     * 方法映射解析 集合LinkedList
+     */
     protected final Collection<MethodResolver> incompleteMethods = new LinkedList<>();
 
     /*
@@ -626,9 +772,11 @@ public class Configuration {
         return parameterHandler;
     }
 
-    public ResultSetHandler newResultSetHandler(Executor executor, MappedStatement mappedStatement, RowBounds rowBounds, ParameterHandler parameterHandler,
+    public ResultSetHandler newResultSetHandler(Executor executor, MappedStatement mappedStatement,
+                                                RowBounds rowBounds, ParameterHandler parameterHandler,
                                                 ResultHandler resultHandler, BoundSql boundSql) {
-        ResultSetHandler resultSetHandler = new DefaultResultSetHandler(executor, mappedStatement, parameterHandler, resultHandler, boundSql, rowBounds);
+        ResultSetHandler resultSetHandler = new DefaultResultSetHandler(executor, mappedStatement, parameterHandler,
+                resultHandler, boundSql, rowBounds);
         resultSetHandler = (ResultSetHandler) interceptorChain.pluginAll(resultSetHandler);
         return resultSetHandler;
     }

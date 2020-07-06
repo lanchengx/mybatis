@@ -33,20 +33,27 @@ import org.apache.ibatis.session.SqlSession;
  */
 public class MapperRegistry {
 
+  // 配置对象，包含所有的配置信息
   private final Configuration config;
+  // 接口和代理对象工厂的对应关系，会用工厂去创建接口的代理对象
   private final Map<Class<?>, MapperProxyFactory<?>> knownMappers = new HashMap<>();
 
+  // 注册 Mapper 接口
   public MapperRegistry(Configuration config) {
     this.config = config;
   }
 
   @SuppressWarnings("unchecked")
+  // 获取 Mapper 接口的代理对象，
   public <T> T getMapper(Class<T> type, SqlSession sqlSession) {
+    // 从缓存中获取该 Mapper 接口的代理工厂对象
     final MapperProxyFactory<T> mapperProxyFactory = (MapperProxyFactory<T>) knownMappers.get(type);
+    // 如果该 Mapper 接口没有注册过，则抛异常
     if (mapperProxyFactory == null) {
       throw new BindingException("Type " + type + " is not known to the MapperRegistry.");
     }
     try {
+      //使用代理工厂创建 Mapper 接口的代理对象
       return mapperProxyFactory.newInstance(sqlSession);
     } catch (Exception e) {
       throw new BindingException("Error getting mapper instance. Cause: " + e, e);
@@ -58,20 +65,26 @@ public class MapperRegistry {
   }
 
   public <T> void addMapper(Class<T> type) {
+    // 是接口，才进行注册
     if (type.isInterface()) {
+      // 如果已经注册过了，则抛出异常，不能重复注册
       if (hasMapper(type)) {
         throw new BindingException("Type " + type + " is already known to the MapperRegistry.");
       }
+      // 是否加载完成的标记
       boolean loadCompleted = false;
       try {
+        // 会为每个 Mapper 接口创建一个代理对象工厂
         knownMappers.put(type, new MapperProxyFactory<>(type));
         // It's important that the type is added before the parser is run
         // otherwise the binding may automatically be attempted by the
         // mapper parser. If the type is already known, it won't try.
+        // 下面这个先不看，主要是xml的解析和注解的处理
         MapperAnnotationBuilder parser = new MapperAnnotationBuilder(config, type);
         parser.parse();
         loadCompleted = true;
       } finally {
+        // 如果注册失败，则移除掉该Mapper接口
         if (!loadCompleted) {
           knownMappers.remove(type);
         }

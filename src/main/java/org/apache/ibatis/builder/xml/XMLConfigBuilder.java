@@ -134,6 +134,7 @@ public class XMLConfigBuilder extends BaseBuilder {
             pluginElement(root.evalNode("plugins"));
             // 自定义对象工程加载
             objectFactoryElement(root.evalNode("objectFactory"));
+            //5.对象包装工厂
             objectWrapperFactoryElement(root.evalNode("objectWrapperFactory"));
             reflectorFactoryElement(root.evalNode("reflectorFactory"));
 
@@ -441,40 +442,67 @@ public class XMLConfigBuilder extends BaseBuilder {
         }
     }
 
-    private void mapperElement(XNode parent) throws Exception {
-        if (parent != null) {
-            for (XNode child : parent.getChildren()) {
-                if ("package".equals(child.getName())) {
-                    String mapperPackage = child.getStringAttribute("name");
-                    configuration.addMappers(mapperPackage);
-                } else {
-                    //读取<mapper resource="mapper/userDao-mapping.xml"/>中的mapper/userDao-mapping.xml,即resource = "mapper/userDao-mapping.xml"
-                    String resource = child.getStringAttribute("resource");
-                    //读取mapper节点的url属性
-                    String url = child.getStringAttribute("url");
-                    //读取mapper节点的class属性
-                    String mapperClass = child.getStringAttribute("class");
-                    ////根据resource加载mapper文件
-                    if (resource != null && url == null && mapperClass == null) {
-                        ErrorContext.instance().resource(resource);
-                        InputStream inputStream = Resources.getResourceAsStream(resource);
-                        XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
-                        mapperParser.parse();
-                    } else if (resource == null && url != null && mapperClass == null) {
-                        ErrorContext.instance().resource(url);
-                        InputStream inputStream = Resources.getUrlAsStream(url);
-                        XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, url, configuration.getSqlFragments());
-                        mapperParser.parse();
-                    } else if (resource == null && url == null && mapperClass != null) {
-                        Class<?> mapperInterface = Resources.classForName(mapperClass);
-                        configuration.addMapper(mapperInterface);
-                    } else {
-                        throw new BuilderException("A mapper element may only specify a url, resource or class, but not more than one.");
-                    }
-                }
-            }
+  private void mapperElement(XNode parent) throws Exception {
+    //如果有配置mappers标签
+    if (parent != null) {
+      //遍历mappers标签下的所有package标签和mapper标签
+      for (XNode child : parent.getChildren()) {
+        //如果child为package标签
+        if ("package".equals(child.getName())) {
+          //获取package标签指定的映射包名路径（相对于类路径的资源引用）
+          String mapperPackage = child.getStringAttribute("name");
+          //将映射包名路径添加到mybatis全局配置信息中
+          configuration.addMappers(mapperPackage);
+        //这里else表示的是mapper标签
+        } else {
+          //resource表示使用相对于类路径的资源引用
+          String resource = child.getStringAttribute("resource");
+          //url表示使用完全限定资源定位符（URL）
+          String url = child.getStringAttribute("url");
+          //使用映射器接口实现类的完全限定类名
+          String mapperClass = child.getStringAttribute("class");
+          //如果配置了resource 但是 url以及mapperClass没有配置
+          if (resource != null && url == null && mapperClass == null) {
+            //设置错误报文实例的资源引用为resource
+            ErrorContext.instance().resource(resource);
+            //获取resource文件输入流
+            InputStream inputStream = Resources.getResourceAsStream(resource);
+            //新建一个XML映射文件构建器
+            XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
+            /**
+             * 解析Mapper.xml，解析mapper标签下的所有标签，并对解析出来的标签信息加以封装，
+             * 然后添加到Mybatis全局配置信息中。然后重新解析Mybatis全局配置信息中未能完成解析的
+             * ResultMap标签信息，CacheRef标签信息，DML标签信息
+             */
+            mapperParser.parse();
+            //如果配置了url但是resource以及mapperClass没有配置
+          } else if (resource == null && url != null && mapperClass == null) {
+            //设置错误报文实例的资源引用为url
+            ErrorContext.instance().resource(url);
+            //获取url文件输入流
+            InputStream inputStream = Resources.getUrlAsStream(url);
+            //新建一个XML映射文件构建器
+            XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, url, configuration.getSqlFragments());
+            /**
+             * 解析Mapper.xml，解析mapper标签下的所有标签，并对解析出来的标签信息加以封装，
+             * 然后添加到Mybatis全局配置信息中。然后重新解析Mybatis全局配置信息中未能完成解析的
+             * ResultMap标签信息，CacheRef标签信息，DML标签信息
+             */
+            mapperParser.parse();
+            //如果配置了mapperClass但是resource以及url没有配置
+          } else if (resource == null && url == null && mapperClass != null) {
+            //加载mapperClass对应的java类
+            Class<?> mapperInterface = Resources.classForName(mapperClass);
+            //将mapperInterface加入到mapperRegistry中
+            configuration.addMapper(mapperInterface);
+          } else {
+            //如果把url,resource,mapperClass都配置，就会抛出异常
+            throw new BuilderException("A mapper element may only specify a url, resource or class, but not more than one.");
+          }
         }
+      }
     }
+  }
 
     /**
      * <environments>标签下的default属性是一个必填属性

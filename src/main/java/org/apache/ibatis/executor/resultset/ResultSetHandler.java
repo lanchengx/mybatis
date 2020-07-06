@@ -26,11 +26,13 @@ import org.apache.ibatis.cursor.Cursor;
  * @author Clinton Begin
  */
 public interface ResultSetHandler {
-
+  //将结果集转化成list
   <E> List<E> handleResultSets(Statement stmt) throws SQLException;
 
+  //将结果集转化出呢个cursor
   <E> Cursor<E> handleCursorResultSets(Statement stmt) throws SQLException;
 
+  //处理存储过程的输出
   void handleOutputParameters(CallableStatement cs) throws SQLException;
 
 }

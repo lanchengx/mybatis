@@ -86,7 +86,6 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
     public Configuration getConfiguration() {
         return configuration;
     }
-
     /**
      * 1.       从核心配置文件mybatis-config.xml中获取Environment（这里面是数据源）；
      * 2.       从Environment中取得DataSource；
@@ -100,43 +99,56 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
      * @param autoCommit
      * @return
      */
-    private SqlSession openSessionFromDataSource(ExecutorType execType, TransactionIsolationLevel level, boolean autoCommit) {
-        Transaction tx = null;
-        try {
-            final Environment environment = configuration.getEnvironment();
-            final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
-            tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
-            final Executor executor = configuration.newExecutor(tx, execType);
-            return new DefaultSqlSession(configuration, executor, autoCommit);
-        } catch (Exception e) {
-            closeTransaction(tx); // may have fetched a connection so lets call close()
-            throw ExceptionFactory.wrapException("Error opening session.  Cause: " + e, e);
-        } finally {
-            ErrorContext.instance().reset();
-        }
+  //从数据源获取数据库连接
+  private SqlSession openSessionFromDataSource(ExecutorType execType, TransactionIsolationLevel level, boolean autoCommit) {
+    Transaction tx = null;
+    try {
+      //获取mybatis配置文件中的environment对象
+      final Environment environment = configuration.getEnvironment();
+      //从environment获取transactionFactory对象
+      final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
+      //创建事务对象
+      tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
+      //根据配置创建executor
+      final Executor executor = configuration.newExecutor(tx, execType);
+      //创建DefaultSqlSession
+      return new DefaultSqlSession(configuration, executor, autoCommit);
+    } catch (Exception e) {
+      closeTransaction(tx); // may have fetched a connection so lets call close()
+      throw ExceptionFactory.wrapException("Error opening session.  Cause: " + e, e);
+    } finally {
+      ErrorContext.instance().reset();
     }
+  }
 
-    private SqlSession openSessionFromConnection(ExecutorType execType, Connection connection) {
-        try {
-            boolean autoCommit;
-            try {
-                autoCommit = connection.getAutoCommit();
-            } catch (SQLException e) {
-                // Failover to true, as most poor drivers
-                // or databases won't support transactions
-                autoCommit = true;
-            }
-            final Environment environment = configuration.getEnvironment();
-            final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
-            final Transaction tx = transactionFactory.newTransaction(connection);
-            final Executor executor = configuration.newExecutor(tx, execType);
-            return new DefaultSqlSession(configuration, executor, autoCommit);
-        } catch (Exception e) {
-            throw ExceptionFactory.wrapException("Error opening session.  Cause: " + e, e);
-        } finally {
-            ErrorContext.instance().reset();
-        }
+  //从数据库连接获取sqlSession
+  private SqlSession openSessionFromConnection(ExecutorType execType, Connection connection) {
+    try {
+      //获取当前连接是否设置事务自动提交
+      boolean autoCommit;
+      try {
+        autoCommit = connection.getAutoCommit();
+      } catch (SQLException e) {
+        // Failover to true, as most poor drivers
+        // or databases won't support transactions
+        autoCommit = true;
+      }
+      //获取mybatis配置文件中的environment对象
+      final Environment environment = configuration.getEnvironment();
+      //从environment获取transactionFactory对象
+      final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
+      //创建事务对象
+      final Transaction tx = transactionFactory.newTransaction(connection);
+      //根据配置创建executor
+      final Executor executor = configuration.newExecutor(tx, execType);
+      //创建DefaultSqlSession
+      return new DefaultSqlSession(configuration, executor, autoCommit);
+    } catch (Exception e) {
+      throw ExceptionFactory.wrapException("Error opening session.  Cause: " + e, e);
+    } finally {
+      ErrorContext.instance().reset();
     }
+  }
 
     private TransactionFactory getTransactionFactoryFromEnvironment(Environment environment) {
         if (environment == null || environment.getTransactionFactory() == null) {

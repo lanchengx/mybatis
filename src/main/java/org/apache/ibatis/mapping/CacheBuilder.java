@@ -89,16 +89,20 @@ public class CacheBuilder {
     return this;
   }
 
+  // 创建缓存
   public Cache build() {
+    // 设置缓存的实现类
     setDefaultImplementations();
     Cache cache = newBaseCacheInstance(implementation, id);
     setCacheProperties(cache);
     // issue #352, do not apply decorators to custom caches
+    // 添加装饰器类
     if (PerpetualCache.class.equals(cache.getClass())) {
       for (Class<? extends Cache> decorator : decorators) {
         cache = newCacheDecoratorInstance(decorator, cache);
         setCacheProperties(cache);
       }
+      // 为 Cache 添加装饰器
       cache = setStandardDecorators(cache);
     } else if (!LoggingCache.class.isAssignableFrom(cache.getClass())) {
       cache = new LoggingCache(cache);
@@ -106,6 +110,7 @@ public class CacheBuilder {
     return cache;
   }
 
+  // 设置 Cache 的默认实现类为 PerpetualCache
   private void setDefaultImplementations() {
     if (implementation == null) {
       implementation = PerpetualCache.class;
@@ -115,22 +120,28 @@ public class CacheBuilder {
     }
   }
 
+  // 添加装饰器
   private Cache setStandardDecorators(Cache cache) {
     try {
       MetaObject metaCache = SystemMetaObject.forObject(cache);
       if (size != null && metaCache.hasSetter("size")) {
         metaCache.setValue("size", size);
       }
+      // 添加 ScheduledCache 装饰器
       if (clearInterval != null) {
         cache = new ScheduledCache(cache);
         ((ScheduledCache) cache).setClearInterval(clearInterval);
       }
+      // 添加SerializedCache装饰器
       if (readWrite) {
         cache = new SerializedCache(cache);
       }
+      // 添加 LoggingCache 装饰器
       cache = new LoggingCache(cache);
+      // 添加  SynchronizedCache 装饰器，保证线程安全
       cache = new SynchronizedCache(cache);
       if (blocking) {
+        // 添加 BlockingCache 装饰器
         cache = new BlockingCache(cache);
       }
       return cache;
